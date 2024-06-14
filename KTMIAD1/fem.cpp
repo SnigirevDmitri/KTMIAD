@@ -72,13 +72,13 @@ double FEM::bc1_value(int iedge)
    {
    case 0:
       p1.x = (g.MeshXYZ[_elems[ielem].nodes[loc_node1]].x + g.MeshXYZ[_elems[ielem].nodes[loc_node2]].x) / 2.0;
-      return 2 * p1.x * p1.x + p1.y * p1.y + p1.z * p1.z;
+      return exp(p1.y * p1.z);
    case 1:
       p1.y = (g.MeshXYZ[_elems[ielem].nodes[loc_node1]].y + g.MeshXYZ[_elems[ielem].nodes[loc_node2]].y) / 2.0;
-      return p1.x * p1.x + 2* p1.y * p1.y + p1.z * p1.z;
+      return exp(p1.x * p1.z);
    case 2:
       p1.z = (g.MeshXYZ[_elems[ielem].nodes[loc_node1]].z + g.MeshXYZ[_elems[ielem].nodes[loc_node2]].z) / 2.0;
-      return p1.x * p1.x + p1.y * p1.y + 2 * p1.z * p1.z;
+      return exp(p1.x * p1.y);
    }
    return 0;
 }
@@ -114,11 +114,14 @@ double FEM::RP_value(int iedge)
    switch (var)
    {
    case 0:
-      return 1.0 / mu * -4 + gamma * bc1_value(iedge);
+      p1.x = (g.MeshXYZ[_elems[ielem].nodes[loc_node1]].x + g.MeshXYZ[_elems[ielem].nodes[loc_node2]].x) / 2.0;
+      return 1.0 / mu * (-exp(p1.y * p1.z) * (p1.y * p1.y + p1.z * p1.z)) + gamma * bc1_value(iedge);
    case 1:
-      return 1.0 / mu * -4 + gamma * bc1_value(iedge);
+      p1.y = (g.MeshXYZ[_elems[ielem].nodes[loc_node1]].y + g.MeshXYZ[_elems[ielem].nodes[loc_node2]].y) / 2.0;
+      return 1.0 / mu * (-exp(p1.x * p1.z) * (p1.x * p1.x + p1.z * p1.z)) + gamma * bc1_value(iedge);
    case 2:
-      return 1.0 / mu * -4 + gamma * bc1_value(iedge);
+      p1.z = (g.MeshXYZ[_elems[ielem].nodes[loc_node1]].z + g.MeshXYZ[_elems[ielem].nodes[loc_node2]].z) / 2.0;
+      return 1.0 / mu * (-exp(p1.x * p1.y) * (p1.x * p1.x + p1.y * p1.y)) + gamma * bc1_value(iedge);
    }
 }
 
@@ -774,7 +777,11 @@ void FEM::CheckSol()
 
    double norm = 0;
    for (int i = 0; i < pogr.size(); i++)
-      norm += sqrt(pogr[i] * pogr[i]);
+      norm += pogr[i] * pogr[i];
 
-   out << norm;
+   double norm_true = 0;
+   for (int i = 0; i < pogr.size(); i++)
+      norm_true += q_true[i] * q_true[i];
+
+   out << std::scientific << sqrt(norm) / sqrt(norm_true);
 }
