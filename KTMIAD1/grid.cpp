@@ -16,19 +16,34 @@ double grid::coord_step(double x0, double x1, int n, double k)
       return (x1 - x0) / n;
 }
 
-void grid::get_grid(std::string file)
+void grid::get_grid()
 {
    st.resize(2);
-   std::ifstream inGrid(file);
-   if (inGrid.is_open())
+   std::ifstream input(directory + "files/input.json ");
+   nlohmann::json inGrid{};
+   if (input.is_open())
    {
-      for (int i = 0; i < 2; i++)
-      {
-         inGrid >> st[i].x >> st[i].y >> st[i].z;
-      }
+      input >> inGrid;
 
-      inGrid >> n_x >> n_y >> n_z >> k_x >> k_y >> k_z;
+      input.close();
+
+      st[0].x = inGrid["area"]["start"][0];
+      st[0].y = inGrid["area"]["start"][1];
+      st[0].z = inGrid["area"]["start"][2];
+
+      st[1].x = inGrid["area"]["end"][0];
+      st[1].y = inGrid["area"]["end"][1];
+      st[1].z = inGrid["area"]["end"][2];
+
+      n_x = inGrid["area"]["n"][0];
+      n_y = inGrid["area"]["n"][1];
+      n_z = inGrid["area"]["n"][2];
+
+      k_x = inGrid["area"]["k"][0];
+      k_y = inGrid["area"]["k"][1];
+      k_z = inGrid["area"]["k"][2];
    }
+   else throw "Can't open file input.json\n";
 
    double tmp, h;
 

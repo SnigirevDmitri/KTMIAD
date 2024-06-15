@@ -1,9 +1,9 @@
 #include "fem.h"
 #include "solver.h"
 
-void FEM::Compute(grid& gr)
+void FEM::Compute()
 {
-   g = gr;
+   g.get_grid();
    init();
    generate_FE();
    buildPortraitOfMatrix();
@@ -18,25 +18,21 @@ void FEM::Compute(grid& gr)
 
 void FEM::init()
 {
+   std::ifstream input(directory + "files/input.json");
+   nlohmann::json inParam{};
+
+   if (input.is_open())
+   {
+      input >> inParam;
+
+      input.close();
+
+      mu = inParam["parameters"]["mu"];
+      gamma = inParam["parameters"]["gamma"];
+      num_test = inParam["parameters"]["num_test"];
+   }
+   else throw "Can't open file input.json\n";
    nUz = g.MeshXYZ.size();
-   // Для численного интегрирования
-   points.resize(3);
-   weights.resize(3);
-   // Точки Гаусса-3
-   points[0] = 0.0;
-   points[1] = sqrt(3.0 / 5);
-   points[2] = -sqrt(3.0 / 5);
-   // Квадратурные веса
-   weights[0] = 8.0 / 9;
-   weights[1] = 5.0 / 9;
-   weights[2] = 5.0 / 9;
-
-   alpha.resize(3);
-   beta.resize(6);
-
-   x_l.resize(4);
-   y_l.resize(4);
-
 }
 
 // Получение значения первого краевого условия
@@ -72,15 +68,66 @@ double FEM::bc1_value(int iedge)
    {
    case 0:
       p1.x = (g.MeshXYZ[_elems[ielem].nodes[loc_node1]].x + g.MeshXYZ[_elems[ielem].nodes[loc_node2]].x) / 2.0;
-      return exp(p1.y * p1.z);
    case 1:
       p1.y = (g.MeshXYZ[_elems[ielem].nodes[loc_node1]].y + g.MeshXYZ[_elems[ielem].nodes[loc_node2]].y) / 2.0;
-      return exp(p1.x * p1.z);
    case 2:
       p1.z = (g.MeshXYZ[_elems[ielem].nodes[loc_node1]].z + g.MeshXYZ[_elems[ielem].nodes[loc_node2]].z) / 2.0;
-      return exp(p1.x * p1.y);
    }
-   return 0;
+
+   switch (num_test)
+   {
+   case 1:
+      switch (var)
+      {
+      case 0:
+         return p1.x + p1.y + p1.z;
+      case 1:
+         return p1.x + 2 * p1.y + p1.z;
+      case 2:
+         return p1.x + p1.y + 3 * p1.z;
+      }
+   case 2:
+      switch (var)
+      {
+      case 0:
+         return pow(p1.x, 2) + pow(p1.y, 2) + pow(p1.z, 2);
+      case 1:
+         return pow(p1.x, 2) + 2 * pow(p1.y, 2) + pow(p1.z, 2);
+      case 2:
+         return pow(p1.x, 2) + pow(p1.y, 2) + 3 * pow(p1.z, 2);
+      }
+   case 3:
+      switch (var)
+      {
+      case 0:
+         return pow(p1.x, 3) + pow(p1.y, 3) + pow(p1.z, 3);
+      case 1:
+         return pow(p1.x, 3) + 2 * pow(p1.y, 3) + pow(p1.z, 3);
+      case 2:
+         return pow(p1.x, 3) + pow(p1.y, 3) + 3 * pow(p1.z, 3);
+      }
+   case 4:
+      switch (var)
+      {
+      case 0:
+         return pow(p1.x, 4) + pow(p1.y, 4) + pow(p1.z, 4);
+      case 1:
+         return pow(p1.x, 4) + 2 * pow(p1.y, 4) + pow(p1.z, 4);
+      case 2:
+         return pow(p1.x, 4) + pow(p1.y, 4) + 3 * pow(p1.z, 4);
+      }
+   case 5:
+      switch (var)
+      {
+      case 0:
+         return sin(p1.y + p1.z);
+      case 1:
+         return sin(p1.x + p1.z);
+      case 2:
+         return sin(p1.x + p1.y);
+      }
+   }
+   throw "Wrong number of test!";
 }
 
 double FEM::RP_value(int iedge)
@@ -115,13 +162,64 @@ double FEM::RP_value(int iedge)
    {
    case 0:
       p1.x = (g.MeshXYZ[_elems[ielem].nodes[loc_node1]].x + g.MeshXYZ[_elems[ielem].nodes[loc_node2]].x) / 2.0;
-      return 1.0 / mu * (-exp(p1.y * p1.z) * (p1.y * p1.y + p1.z * p1.z)) + gamma * bc1_value(iedge);
    case 1:
       p1.y = (g.MeshXYZ[_elems[ielem].nodes[loc_node1]].y + g.MeshXYZ[_elems[ielem].nodes[loc_node2]].y) / 2.0;
-      return 1.0 / mu * (-exp(p1.x * p1.z) * (p1.x * p1.x + p1.z * p1.z)) + gamma * bc1_value(iedge);
    case 2:
       p1.z = (g.MeshXYZ[_elems[ielem].nodes[loc_node1]].z + g.MeshXYZ[_elems[ielem].nodes[loc_node2]].z) / 2.0;
-      return 1.0 / mu * (-exp(p1.x * p1.y) * (p1.x * p1.x + p1.y * p1.y)) + gamma * bc1_value(iedge);
+   }
+
+   switch (num_test)
+   {
+   case 1:
+      switch (var)
+      {
+      case 0:
+         return 1.0 / mu * (0) + gamma * bc1_value(iedge);
+      case 1:
+         return 1.0 / mu * (0) + gamma * bc1_value(iedge);
+      case 2:
+         return 1.0 / mu * (0) + gamma * bc1_value(iedge);
+      }
+   case 2:
+      switch (var)
+      {
+      case 0:
+         return 1.0 / mu * (-4) + gamma * bc1_value(iedge);
+      case 1:
+         return 1.0 / mu * (-4) + gamma * bc1_value(iedge);
+      case 2:
+         return 1.0 / mu * (-4) + gamma * bc1_value(iedge);
+      }
+   case 3:
+      switch (var)
+      {
+      case 0:
+         return 1.0 / mu * (-6 * (p1.y + p1.z)) + gamma * bc1_value(iedge);
+      case 1:
+         return 1.0 / mu * (-6 * (p1.x + p1.z)) + gamma * bc1_value(iedge);
+      case 2:
+         return 1.0 / mu * (-6 * (p1.x + p1.y)) + gamma * bc1_value(iedge);
+      }
+   case 4:
+      switch (var)
+      {
+      case 0:
+         return 1.0 / mu * (-12 * (pow(p1.y, 2) + pow(p1.z, 2))) + gamma * bc1_value(iedge);
+      case 1:
+         return 1.0 / mu * (-12 * (pow(p1.x, 2) + pow(p1.z, 2))) + gamma * bc1_value(iedge);
+      case 2:
+         return 1.0 / mu * (-12 * (pow(p1.x, 2) + pow(p1.y, 2))) + gamma * bc1_value(iedge);
+      }
+   case 5:
+      switch (var)
+      {
+      case 0:
+         return 1.0 / mu * (2 * sin(p1.y + p1.z)) + gamma * bc1_value(iedge);
+      case 1:
+         return 1.0 / mu * (2 * sin(p1.x + p1.z)) + gamma * bc1_value(iedge);
+      case 2:
+         return 1.0 / mu * (2 * sin(p1.x + p1.y)) + gamma * bc1_value(iedge);
+      }
    }
 }
 

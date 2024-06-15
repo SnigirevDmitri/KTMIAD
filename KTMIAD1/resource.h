@@ -10,6 +10,9 @@
 #include <iostream>
 #include <locale.h>
 #include <math.h>
+#include "../KTMIAD1/nlohmann/json.hpp"
+
+const std::string directory = "../KTMIAD1/";
 
 struct point
 {

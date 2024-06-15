@@ -144,6 +144,9 @@
     <Text Include="res.txt" />
     <Text Include="Solution.txt" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="files\input.json" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

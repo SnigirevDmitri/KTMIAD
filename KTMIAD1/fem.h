@@ -36,7 +36,7 @@ class FEM
 {
 public:
    void init();
-   void Compute(grid &gr);
+   void Compute();
    void generate_FE();
    void edge_from_nodes(int node1, int node2);
    int FE_from_edge(int edge);
@@ -79,6 +79,7 @@ private:
    std::vector<double> F_loc;
    double mu = 1.0;
    double gamma = 1.0;
+   int num_test;
    int nx, ny, nz;
 
    std::vector<std::vector<double>> M =

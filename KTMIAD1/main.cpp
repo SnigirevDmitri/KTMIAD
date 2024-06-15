@@ -4,8 +4,8 @@
 int main()
 {
 	setlocale(LC_ALL, "Rus");
-	grid gr;
-	gr.get_grid("grid.txt");
+	//grid gr;
+	//gr.get_grid("grid.txt");
 
 	std::ofstream out("out.txt");
 
@@ -19,7 +19,7 @@ int main()
 	//out.close();
 
 	FEM fm;
-	fm.Compute(gr);
+	fm.Compute();
 
 	//out.open("q.txt");
 	//for (int i = 0; i < fm.q.size(); i++)
