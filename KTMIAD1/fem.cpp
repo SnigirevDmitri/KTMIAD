@@ -864,6 +864,8 @@ void FEM::CheckSol()
 {
    std::ofstream out(directory + "files/Solution.txt");
    std::vector<double> q_true;
+
+   out << "iedge" << std::setw(5) << "q" << std::setw(21) << "q*" << std::setw(27) << "|q - q*|" << std::setw(29) << "||q - q*||/||q*||" << std::endl;
    
    for(int iedge = 0; iedge < n_edges; iedge++)
       q_true.push_back(bc1_value(iedge));
@@ -881,5 +883,13 @@ void FEM::CheckSol()
    for (int i = 0; i < pogr.size(); i++)
       norm_true += q_true[i] * q_true[i];
 
-   out << std::scientific << sqrt(norm) / sqrt(norm_true);
+   //out << std::scientific << sqrt(norm) / sqrt(norm_true);
+
+   out << 0 << std::setw(20) << q[0] << std::setw(20) << q_true[0] << std::setw(20) << pogr[0] << std::setw(20) << sqrt(norm) / sqrt(norm_true) << std::endl;
+
+   for(int i = 1; i < 10; i++)
+      out << i << std::setw(20) << q[i] << std::setw(20) << q_true[i] << std::setw(20) << pogr[i] << std::endl;
+
+   for (int i = 11; i < q.size(); i++)
+      out << i << std::setw(19) << q[i] << std::setw(20) << q_true[i] << std::setw(20) << pogr[i] << std::endl;
 }
