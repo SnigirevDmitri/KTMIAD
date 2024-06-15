@@ -139,13 +139,10 @@
     <ClInclude Include="solver.h" />
   </ItemGroup>
   <ItemGroup>
-    <Text Include="grid.txt" />
-    <Text Include="out.txt" />
-    <Text Include="res.txt" />
-    <Text Include="Solution.txt" />
+    <None Include="files\input.json" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="files\input.json" />
+    <Text Include="files\Solution.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

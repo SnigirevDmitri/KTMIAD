@@ -862,7 +862,7 @@ bool FEM::isInBoundary(int num)
 
 void FEM::CheckSol()
 {
-   std::ofstream out("Solution.txt");
+   std::ofstream out(directory + "files/Solution.txt");
    std::vector<double> q_true;
    
    for(int iedge = 0; iedge < n_edges; iedge++)

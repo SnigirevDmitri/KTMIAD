@@ -43,22 +43,13 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Text Include="grid.txt">
-      <Filter>Файлы ресурсов</Filter>
-    </Text>
-    <Text Include="out.txt">
-      <Filter>Файлы ресурсов</Filter>
-    </Text>
-    <Text Include="res.txt">
-      <Filter>Файлы ресурсов</Filter>
-    </Text>
-    <Text Include="Solution.txt">
-      <Filter>Файлы ресурсов</Filter>
-    </Text>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="files\input.json">
       <Filter>Файлы ресурсов</Filter>
     </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="files\Solution.txt">
+      <Filter>Файлы ресурсов</Filter>
+    </Text>
   </ItemGroup>
 </Project>

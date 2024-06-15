@@ -8,6 +8,6 @@
    "parameters": {
       "mu": 1,
       "gamma": 1,
-      "num_test": 5
+      "num_test": 3
    }
 }
