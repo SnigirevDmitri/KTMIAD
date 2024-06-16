@@ -6,14 +6,18 @@ void FEM::Compute()
    g.get_grid();
    init();
    generate_FE();
+   std::cout << "Сборка СЛАУ началась." << std::endl;
    buildPortraitOfMatrix();
    assemblyGlobalMatrix();
-   //bc2();
    bc1();
+   std::cout << "Сборка СЛАУ завершена." << std::endl;
 
+   std::cout << "Решение СЛАУ началось." << std::endl;
    solver s;
    q = s.BCGSTAB(gg, di, F, ig, jg);
+   std::cout << "Решение СЛАУ завершено." << std::endl;
    CheckSol();
+   system("pause");
 }
 
 void FEM::init()
