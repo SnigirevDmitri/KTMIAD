@@ -348,48 +348,6 @@ void FEM::generate_FE()
    di.resize(n_edges);
    F.resize(n_edges);
    q.resize(n_edges);
-
-
-//   // Глобальная нумерация граней для каждого конечного элемента
-//   int m1 = 2 * g.n_circle + 1;
-//   for (int i = 0, m = 0, k = 0; i < g.n_line; i++, m += g.n_circle + 1)
-//   {
-//      for (int j = 0; j < g.n_circle; j++, k++, m++)
-//      {
-//         _elems[k].edges[0] = m;
-//         _elems[k].edges[1] = m + g.n_circle;
-//         _elems[k].edges[2] = m + g.n_circle + 1;
-//         _elems[k].edges[3] = m + m1;
-//      }
-//   }
-//   
-//   // Соответствующие узлы для каждой грани
-//   int edge_size = g.n_circle * (g.n_line + 1) + (g.n_circle + 1) * g.n_line;
-//   _edges.resize(edge_size);
-//   for (int i = 0; i < edge_size; i++)
-//   {
-//      _edges[i].nodes.resize(2);
-//   }
-//   
-//   // Записываем "горизонтальные" грани
-//   m1 = 2 * g.n_circle + 1;
-//   for (int i = 0, m = 0; i < g.n_line + 1; i++, m ++)
-//   {
-//      for (int j = 0; j < g.n_circle; j++, m++)
-//      {
-//         _edges[i * m1 + j].nodes = { m, m + 1 };
-//      }
-//   }
-//
-//   // Записываем "вертикальные" грани
-//   int m2 = g.n_circle + 1;
-//   for (int i = 0, m = 0; i < g.n_line; i++)
-//   {
-//      for (int j = 0; j < g.n_circle + 1; j++, m++)
-//      {
-//         _edges[m1 * i + j + g.n_circle].nodes = { m, m + m2 };
-//      }
-//   }
 }
 
 void FEM::edge_from_nodes(int node1, int node2)
@@ -498,48 +456,49 @@ void FEM::getLocalG(double hx, double hy, double hz)
     double hx_6 = hx / 6.0;
     double hy_6 = hy / 6.0;
     double hz_6 = hz / 6.0;
+    double coef = 1.0 / mu;
 
     for(int i = 0; i < 4; i++)
         for (int j = 0; j < 4; j++)
-            G_loc[i][j] = 1. / mu * (hx_hy_6hz * G1[i][j] + hx_hz_6hy * G2[i][j]);
+            G_loc[i][j] = coef * (hx_hy_6hz * G1[i][j] + hx_hz_6hy * G2[i][j]);
 
     for (int i = 0; i < 4; i++)
         for (int j = 4; j < 8; j++)
-            G_loc[i][j] = (-hz_6) * G2[i][j - 4];
+            G_loc[i][j] = coef * (-hz_6) * G2[i][j - 4];
 
     for (int i = 0; i < 4; i++)
         for (int j = 8; j < 12; j++)
-            G_loc[i][j] = (hy_6)*G3[i][j - 8];
+            G_loc[i][j] = coef * (hy_6)*G3[i][j - 8];
 
     for (int i = 4; i < 8; i++)
         for (int j = 0; j < 4; j++)
-            G_loc[i][j] = (-hz_6) * G2[i - 4][j];
+            G_loc[i][j] = coef * (-hz_6) * G2[i - 4][j];
 
     for (int i = 4; i < 8; i++)
         for (int j = 4; j < 8; j++)
-            G_loc[i][j] = hx_hy_6hz * G1[i - 4][j - 4] + hy_hz_6hx * G2[i - 4][j - 4];
+            G_loc[i][j] = coef * (hx_hy_6hz * G1[i - 4][j - 4] + hy_hz_6hx * G2[i - 4][j - 4]);
 
     for (int i = 4; i < 8; i++)
         for (int j = 8; j < 12; j++)
-            G_loc[i][j] = (-hx_6) * G1[i - 4][j - 8];
+            G_loc[i][j] = coef * (-hx_6) * G1[i - 4][j - 8];
 
     for (int i = 8; i < 12; i++)
         for (int j = 0; j < 4; j++)
-            G_loc[i][j] = hy_6 * G3_T[i - 8][j];
+            G_loc[i][j] = coef * hy_6 * G3_T[i - 8][j];
 
     for (int i = 8; i < 12; i++)
         for (int j = 4; j < 8; j++)
-            G_loc[i][j] = (-hx_6) * G1[i - 8][j - 4];
+            G_loc[i][j] = coef * (-hx_6) * G1[i - 8][j - 4];
 
     for (int i = 8; i < 12; i++)
         for (int j = 8; j < 12; j++)
-            G_loc[i][j] = hx_hz_6hy * G1[i - 8][j - 8] + hy_hz_6hx * G2[i - 8][j - 8];
+            G_loc[i][j] = coef * (hx_hz_6hy * G1[i - 8][j - 8] + hy_hz_6hx * G2[i - 8][j - 8]);
 
 }
 
 void FEM::getLocalM(double hx, double hy, double hz)
 {
-    double coef = (hx * hy * hz) / 36.0;
+    double coef = gamma * (hx * hy * hz) / 36.0;
     for (int i = 0; i < M_loc.size(); i++)
         for (int j = 0; j < M_loc[i].size(); j++)
             M_loc[i][j] = coef * M[i][j];
@@ -889,11 +848,11 @@ void FEM::CheckSol()
 
    //out << std::scientific << sqrt(norm) / sqrt(norm_true);
 
-   out << 0 << std::setw(20) << q[0] << std::setw(20) << q_true[0] << std::setw(20) << pogr[0] << std::setw(20) << sqrt(norm) / sqrt(norm_true) << std::endl;
+   out << std::scientific << 0 << std::setw(20) << q[0] << std::setw(20) << q_true[0] << std::setw(20) << pogr[0] << std::setw(20) << sqrt(norm) / sqrt(norm_true) << std::endl;
 
    for(int i = 1; i < 10; i++)
-      out << i << std::setw(20) << q[i] << std::setw(20) << q_true[i] << std::setw(20) << pogr[i] << std::endl;
+      out << std::scientific << i << std::setw(20) << q[i] << std::setw(20) << q_true[i] << std::setw(20) << pogr[i] << std::endl;
 
    for (int i = 11; i < q.size(); i++)
-      out << i << std::setw(19) << q[i] << std::setw(20) << q_true[i] << std::setw(20) << pogr[i] << std::endl;
+      out << std::scientific << i << std::setw(19) << q[i] << std::setw(20) << q_true[i] << std::setw(20) << pogr[i] << std::endl;
 }
