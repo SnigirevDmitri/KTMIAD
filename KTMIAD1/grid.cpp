@@ -19,7 +19,7 @@ double grid::coord_step(double x0, double x1, int n, double k)
 void grid::get_grid()
 {
    st.resize(2);
-   std::ifstream input(directory + "files/input.json ");
+   std::ifstream input("files/input.json ");
    nlohmann::json inGrid{};
    if (input.is_open())
    {

@@ -12,7 +12,7 @@
 #include <math.h>
 #include "../KTMIAD1/nlohmann/json.hpp"
 
-const std::string directory = "../KTMIAD1/";
+const std::string directory = "../";
 
 struct point
 {

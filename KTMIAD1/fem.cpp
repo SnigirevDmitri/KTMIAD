@@ -22,7 +22,7 @@ void FEM::Compute()
 
 void FEM::init()
 {
-   std::ifstream input(directory + "files/input.json");
+   std::ifstream input("files/input.json");
    nlohmann::json inParam{};
 
    if (input.is_open())
@@ -825,7 +825,7 @@ bool FEM::isInBoundary(int num)
 
 void FEM::CheckSol()
 {
-   std::ofstream out(directory + "files/Solution.txt");
+   std::ofstream out("files/Solution.txt");
    std::vector<double> q_true;
 
    out << "iedge" << std::setw(5) << "q" << std::setw(21) << "q*" << std::setw(27) << "|q - q*|" << std::setw(29) << "||q - q*||/||q*||" << std::endl;
